@@ -3,3 +3,4 @@ pandas
 sqlalchemy
 plotly
 gunicorn
+psycopg2-binary
