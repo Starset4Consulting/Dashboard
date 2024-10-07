@@ -23,10 +23,16 @@ def load_surveys():
     surveys = pd.read_sql_query("SELECT id, name, questions FROM surveys", engine)
     return surveys
 
-# Load survey responses data
+# Load survey responses along with user phone numbers
 def load_survey_responses():
     engine = connect_db()
-    responses = pd.read_sql_query("SELECT * FROM survey_responses", engine)
+    # Join users and survey_responses on user_id to get phone numbers
+    query = """
+    SELECT sr.*, u.phone_number 
+    FROM survey_responses sr
+    JOIN users u ON sr.user_id = u.id
+    """
+    responses = pd.read_sql_query(query, engine)
     return responses
 
 # Aggregate selected options
@@ -84,7 +90,8 @@ def main():
         lambda x: eval(x) if isinstance(x, str) else x
     )
     
-    st.dataframe(filtered_responses[['responses', 'location', 'voice_recording_path']])
+    # Display the relevant columns including phone_number
+    st.dataframe(filtered_responses[['phone_number', 'responses', 'location', 'voice_recording_path']])
 
     # Aggregate selected options
     option_counts = aggregate_selected_options(filtered_responses)
