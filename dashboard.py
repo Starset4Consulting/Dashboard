@@ -90,6 +90,9 @@ def main():
         lambda x: eval(x) if isinstance(x, str) else x
     )
     
+    # Set response_id as the index for the displayed DataFrame
+    filtered_responses.set_index('id', inplace=True)
+
     # Display the relevant columns including phone_number
     st.dataframe(filtered_responses[['phone_number', 'responses', 'location', 'voice_recording_path']])
 
