@@ -15,7 +15,7 @@ def connect_db():
 # Load user data
 def load_users():
     engine = connect_db()
-    users = pd.read_sql_query("SELECT id, phone_number, username FROM users", engine)
+    users = pd.read_sql_query("SELECT id, phone_number, username, password FROM users", engine)
     return users
 
 # Load survey data
@@ -106,6 +106,11 @@ def main():
 
     # Convert 'response_timestamp' to IST
     responses['response_timestamp'] = responses['response_timestamp'].apply(convert_to_ist)
+
+    # Add a button to view the list of users
+    if st.sidebar.button("View Users"):
+        st.write("### List of Users")
+        st.dataframe(users[['id', 'phone_number', 'username', 'password']])
 
     # Create a filter for selecting surveys and users
     survey_filter = st.sidebar.selectbox("Select Survey", surveys['name'].unique())
