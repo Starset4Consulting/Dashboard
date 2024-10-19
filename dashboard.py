@@ -100,28 +100,30 @@ def main():
     st.title("Survey Data Dashboard")
 
     # Load data from the database
-    users = load_users()
+    users = load_users()  # Load user data here
     surveys = load_surveys()
     responses = load_survey_responses()
 
     # Convert 'response_timestamp' to IST
     responses['response_timestamp'] = responses['response_timestamp'].apply(convert_to_ist)
 
-    # Add a button to view the list of users
-    if st.sidebar.button("View Users"):
-        st.write("### List of Users")
-        st.dataframe(users[['id', 'phone_number', 'username', 'password']])
+    # Add a phone number filter to the sidebar with an "All" option
+    phone_numbers = users['phone_number'].unique().tolist()
+    phone_numbers.insert(0, "All")  # Insert "All" at the beginning of the list
+    phone_filter = st.sidebar.selectbox("Select Phone Number", phone_numbers)
+
+    # Filter responses based on the selected phone number
+    if phone_filter != "All":
+        filtered_responses = responses[responses['phone_number'] == phone_filter]
+    else:
+        filtered_responses = responses  # Show all responses if "All" is selected
 
     # Create a filter for selecting surveys and users
     survey_filter = st.sidebar.selectbox("Select Survey", surveys['name'].unique())
 
     # Filter the responses based on the selected survey
     filtered_survey_id = surveys[surveys['name'] == survey_filter].iloc[0]['id']
-    filtered_responses = responses[responses['survey_id'] == filtered_survey_id]
-
-    # Add a phone number filter to the sidebar
-    phone_filter = st.sidebar.selectbox("Select Phone Number", users['phone_number'].unique())
-    filtered_responses = filtered_responses[filtered_responses['phone_number'] == phone_filter]
+    filtered_responses = filtered_responses[filtered_responses['survey_id'] == filtered_survey_id]
 
     # Get the questions for the selected survey
     survey_questions_str = surveys[surveys['name'] == survey_filter].iloc[0]['questions']
@@ -135,7 +137,7 @@ def main():
     st.write(f"### Showing Responses for Survey: {survey_filter}")
 
     # Pagination variables
-    rows_per_page = 100000000000000000000000000000000000000000000000000000000000000
+    rows_per_page = 10
     page_number = st.sidebar.number_input("Page Number", min_value=1, max_value=(len(filtered_responses) // rows_per_page) + 1, step=1)
 
     # Calculate starting and ending indices for the current page
