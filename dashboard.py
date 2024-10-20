@@ -137,7 +137,7 @@ def main():
     st.write(f"### Showing Responses for Survey: {survey_filter}")
 
     # Pagination variables
-    rows_per_page = 250
+    rows_per_page = 2500
     page_number = st.sidebar.number_input("Page Number", min_value=1, max_value=(len(filtered_responses) // rows_per_page) + 1, step=1)
 
     # Calculate starting and ending indices for the current page
